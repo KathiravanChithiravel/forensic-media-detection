@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade">
+    <!-- Admin Hero Stats -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary text-white h-100">
+                <i class="fas fa-users fs-1 mb-3 opacity-50"></i>
+                <h6 class="text-uppercase small fw-bold opacity-75">Registered Users</h6>
+                <h2 class="fw-bold mb-0">{{ stats.total_users }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-dark text-white h-100">
+                <i class="fas fa-file-shield fs-1 mb-3 opacity-50"></i>
+                <h6 class="text-uppercase small fw-bold opacity-75">Total Forensic Audits</h6>
+                <h2 class="fw-bold mb-0">{{ stats.total_audits }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-info text-white h-100">
+                <i class="fas fa-image fs-1 mb-3 opacity-50"></i>
+                <h6 class="text-uppercase small fw-bold opacity-75">Image Audits</h6>
+                <h2 class="fw-bold mb-0">{{ stats.image_audits }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-warning text-dark h-100">
+                <i class="fas fa-video fs-1 mb-3 opacity-50"></i>
+                <h6 class="text-uppercase small fw-bold opacity-75">Video Audits</h6>
+                <h2 class="fw-bold mb-0">{{ stats.video_audits }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Tabs -->
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-0 p-0">
+            <ul class="nav nav-tabs nav-fill admin-tabs" id="adminTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active py-4 fw-bold" id="users-tab" data-bs-toggle="tab"
+                        data-bs-target="#users" type="button"><i class="fas fa-user-gear me-2"></i> Investigator
+                        Management</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link py-4 fw-bold" id="uploads-tab" data-bs-toggle="tab"
+                        data-bs-target="#uploads" type="button"><i class="fas fa-database me-2"></i> Global Audit
+                        Registry</button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body p-4">
+            <div class="tab-content" id="adminTabContent">
+                <!-- User Management -->
+                <div class="tab-pane fade show active" id="users" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="border-0">Investigator</th>
+                                    <th class="border-0">Email</th>
+                                    <th class="border-0">Role</th>
+                                    <th class="border-0 text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in users %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                                style="width: 40px; height: 40px;">
+                                                {{ u.username[0]|upper }}
+                                            </div>
+                                            <span class="fw-bold">{{ u.username }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted">{{ u.email }}</td>
+                                    <td>
+                                        {% if u.is_admin %}
+                                        <span class="badge bg-danger rounded-pill px-3">Administrator</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary rounded-pill px-3">Investigator</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if not u.is_admin %}
+                                        <a href="{{ url_for('delete_user', id=u.id) }}"
+                                            class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                                            onclick="return confirm('Secure Wipe: This will delete all history for this user. Continue?')">
+                                            <i class="fas fa-trash-can me-1"></i> Delete
+                                        </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Global Upload Audit -->
+                <div class="tab-pane fade" id="uploads" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="border-0">Timestamp</th>
+                                    <th class="border-0">Owner</th>
+                                    <th class="border-0">Media Type</th>
+                                    <th class="border-0">Forensic Verdict</th>
+                                    <th class="border-0">Confidence</th>
+                                    <th class="border-0 text-end">Management</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for up in uploads %}
+                                <tr>
+                                    <td class="small text-muted">{{ up.date_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td class="fw-bold">{{ up.owner.username }}</td>
+                                    <td>
+                                        {% if up.file_type == 'image' %}
+                                        <span
+                                            class="badge bg-info-subtle text-info border border-info border-opacity-25 rounded-pill"><i
+                                                class="fas fa-image me-1"></i> Image</span>
+                                        {% else %}
+                                        <span
+                                            class="badge bg-warning-subtle text-warning border border-warning border-opacity-25 rounded-pill"><i
+                                                class="fas fa-video me-1"></i> Video</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="fw-bold {% if 'Fake' in up.result or 'AI' in up.result %}text-danger{% elif 'Real' in up.result %}text-success{% else %}text-warning{% endif %}">
+                                            {{ up.result }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 6px; width: 60px;">
+                                                <div class="progress-bar {% if up.confidence_score > 80 %}bg-danger{% else %}bg-primary{% endif %}"
+                                                    style="width: {{ up.confidence_score }}%"></div>
+                                            </div>
+                                            <span class="small fw-bold">{{ up.confidence_score|int }}%</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-end d-flex justify-content-end align-items-center gap-2">
+                                        <a href="{{ url_for('view_report', report_id=up.id) }}"
+                                            class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                            <i class="fas fa-eye me-1"></i> View Report
+                                        </a>
+                                        <a href="{{ url_for('delete_upload', id=up.id) }}"
+                                            class="btn btn-link text-danger p-0"
+                                            onclick="return confirm('Remove audit record?')">
+                                            <i class="fas fa-times-circle fs-5"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        border-bottom: 3px solid transparent;
+        transition: 0.3s;
+    }
+
+    .admin-tabs .nav-link:hover {
+        background: #f8f9fa;
+        color: var(--primary-blue);
+    }
+
+    .admin-tabs .nav-link.active {
+        color: var(--primary-blue);
+        border-bottom-color: var(--primary-blue);
+        background: transparent;
+    }
+
+    .avatar {
+        font-weight: 800;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}

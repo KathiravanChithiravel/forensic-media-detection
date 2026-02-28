@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade">
+    <div class="col-md-6">
+        <div class="card auth-card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-blue-gradient py-5 text-center text-white">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="80" height="80"
+                    class="mb-3 rounded-circle border border-3 border-white border-opacity-25 shadow">
+                <h2 class="fw-bold mb-0">Secure Login</h2>
+                <small class="opacity-75">Access the Multi-Layer Forensic Audit Network</small>
+            </div>
+            <div class="card-body p-5">
+                <form action="{{ url_for('login') }}" method="POST">
+                    <div class="form-floating mb-3">
+                        <input type="text" name="username" class="form-control" id="uInput" placeholder="Username"
+                            required>
+                        <label for="uInput"><i class="fas fa-user me-2 text-primary"></i> Username</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="password" name="password" class="form-control" id="pInput" placeholder="Password"
+                            required>
+                        <label for="pInput"><i class="fas fa-key me-2 text-primary"></i> Password</label>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary-gradient py-3 fw-bold rounded-pill shadow">
+                            Authenticate <i class="fas fa-chevron-right ms-2 scale-hover"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="text-center mt-4 pt-3 border-top border-light">
+                    <a href="{{ url_for('forgot_password') }}" class="text-decoration-none text-muted small me-3">Forgot
+                        Credentials?</a>
+                    <a href="{{ url_for('register') }}" class="text-decoration-none text-primary fw-bold small">Create
+                        Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center animate-fade">
+    <div class="col-md-7">
+        <div class="card auth-card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-blue-gradient py-5 text-center text-white">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="80" height="80"
+                    class="mb-3 rounded-circle border border-3 border-white border-opacity-25 shadow">
+                <h2 class="fw-bold mb-0">Join Audit Network</h2>
+                <small class="opacity-75">Start auditing AI-generated and edited media files</small>
+            </div>
+            <div class="card-body p-5">
+                <form action="{{ url_for('register') }}" method="POST">
+                    <div class="form-floating mb-3">
+                        <input type="text" name="username" class="form-control" id="uInput"
+                            placeholder="Create Username" required>
+                        <label for="uInput"><i class="fas fa-user-plus me-2 text-primary"></i> Pick a Username</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="email" name="email" class="form-control" id="eInput" placeholder="Active Email"
+                            required>
+                        <label for="eInput"><i class="fas fa-envelope me-2 text-primary"></i> Email Address</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="password" name="password" class="form-control" id="pInput"
+                            placeholder="Strong Password" required>
+                        <label for="pInput"><i class="fas fa-key me-2 text-primary"></i> Create Password</label>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary-gradient py-3 fw-bold rounded-pill shadow">
+                            Complete Setup <i class="fas fa-user-check ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="text-center mt-4 pt-3 border-top border-light">
+                    <p class="mb-0 text-muted small">Already registered? <a href="{{ url_for('login') }}"
+                            class="text-primary-gradient fw-bold text-decoration-none">Sign In Here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

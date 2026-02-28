@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+instance/
+.pytest_cache/
+.coverage
+htmlcov/
+database.db
+static/uploads/*
+static/ela_results/*
+!static/uploads/.gitkeep
+!static/ela_results/.gitkeep
+.env
+.flaskenv
+*.log

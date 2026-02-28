@@ -1,0 +1,494 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-4 animate-fade">
+    <!-- Analysis Status Header -->
+    <div class="col-12">
+        <div
+            class="card {% if '(FAKE)' in data.result %}bg-danger{% else %}bg-blue-gradient{% endif %} text-white border-0 shadow-lg p-4 rounded-4 position-relative overflow-hidden">
+            <div class="row align-items-center position-relative" style="z-index: 2;">
+                <div class="col-auto">
+                    <div class="bg-white p-2 rounded-circle text-center d-flex align-items-center justify-content-center shadow-sm"
+                        style="width: 85px; height: 85px;">
+                        {% if '(FAKE)' in data.result %}
+                        <i class="fas fa-triangle-exclamation text-danger fs-1 animate-pulse"></i>
+                        {% else %}
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" width="70" height="70"
+                            class="rounded-circle">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col">
+                    <h1 class="fw-bold mb-1">
+                        {% if '(FAKE)' in data.result %}
+                        <span class="badge bg-white text-danger me-2 shadow-sm">FAKE</span>
+                        {% endif %}
+                        Forensic Verdict: {{ data.result }}
+                    </h1>
+                    <p class="mb-0 opacity-75 fs-5">Primary Confidence Level: <span class="fw-bold text-white">{{
+                            data.confidence|int }}%</span></p>
+                </div>
+                <div class="col-auto d-flex gap-2">
+                    <button class="btn btn-light fw-bold px-4 rounded-pill shadow-sm" onclick="window.print()"><i
+                            class="fas fa-print me-2"></i> Print</button>
+                    {% if data.id %}
+                    <button class="btn btn-primary-gradient px-4 rounded-pill shadow-sm"
+                        onclick="sendEmail('{{ data.id }}')">
+                        <i class="fas fa-paper-plane me-2"></i> Email Report
+                    </button>
+                    {% endif %}
+                    <a href="{{ url_for('upload') }}" class="btn btn-outline-light px-4 rounded-pill">Another</a>
+                </div>
+            </div>
+            <!-- Decorative Background Icon -->
+            <i class="fas fa-shield-halved position-absolute end-0 bottom-0 opacity-10"
+                style="font-size: 10rem; transform: translate(20%, 20%);"></i>
+        </div>
+    </div>
+
+    <!-- Probability Breakdown Panel -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h5 class="fw-bold mb-3"><i class="fas fa-chart-pie me-2 text-primary"></i> Multi-Layer Confidence Breakdown
+            </h5>
+            <div class="row align-items-center g-4">
+                <div class="col-md-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-bold text-success">Real Probability</span>
+                        <span class="fw-bold text-success">{{ data.prob_real|int }}%</span>
+                    </div>
+                    <div class="progress" style="height: 12px; border-radius: 6px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ data.prob_real }}%">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-bold text-warning">Edited Probability</span>
+                        <span class="fw-bold text-warning">{{ data.prob_edited|int }}%</span>
+                    </div>
+                    <div class="progress" style="height: 12px; border-radius: 6px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: {{ data.prob_edited }}%">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-bold text-danger">AI Generated Probability</span>
+                        <span class="fw-bold text-danger">{{ data.prob_ai|int }}%</span>
+                    </div>
+                    <div class="progress" style="height: 12px; border-radius: 6px;">
+                        <div class="progress-bar bg-danger" role="progressbar" style="width: {{ data.prob_ai }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if data.type == 'image' %}
+    <!-- Forensic Visualizer Logic -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+            <div
+                class="card-header bg-white border-0 py-3 mx-2 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-image me-2 text-primary"></i> Multi-Layer Forensic Visualizer
+                </h5>
+                <div class="d-flex flex-wrap gap-2" id="forensicFilters">
+                    <button class="btn btn-sm btn-outline-primary active px-3 rounded-pill"
+                        onclick="showMap('original')">Original</button>
+                    <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" onclick="showMap('ela')">ELA
+                        Map</button>
+                    <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" onclick="showMap('noise')">Noise
+                        Map</button>
+                    <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" onclick="showMap('clone')">Clone
+                        Map</button>
+                    <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" onclick="showMap('regions')">Region
+                        Audit Grid</button>
+                </div>
+            </div>
+            <div class="card-body p-2 text-center bg-dark bg-opacity-10 position-relative">
+                <div id="visual-container" class="position-relative d-inline-block">
+                    <!-- Images will be toggled here -->
+                    <img id="map-original" src="{{ url_for('static', filename='uploads/' + data.filename) }}"
+                        class="img-fluid rounded shadow-sm">
+                    <img id="map-ela" src="{{ url_for('static', filename='ela_results/' + data.ela_filename) }}"
+                        class="img-fluid rounded shadow-sm d-none">
+                    <img id="map-noise" src="{{ url_for('static', filename='ela_results/' + data.noise_filename) }}"
+                        class="img-fluid rounded shadow-sm d-none">
+                    <img id="map-clone" src="{{ url_for('static', filename='ela_results/' + data.clone_filename) }}"
+                        class="img-fluid rounded shadow-sm d-none">
+
+                    <div id="map-regions" class="position-absolute top-0 start-0 w-100 h-100 d-grid d-none"
+                        style="grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);">
+                        {% for r in data.regions %}
+                        <div class="region-box {% if r.is_suspicious %}suspicious{% endif %}"
+                            onclick="showRegionDetails('{{ r.id }}', '{{ r.explanation }}', '{{ r.confidence }}', '{{ r.tool_inference }}', '{{ r.is_suspicious }}')">
+                            <div
+                                class="badge bg-danger p-1 m-1 x-ss-small {% if not r.is_suspicious %}d-none{% endif %}">
+                                <i class="fas fa-triangle-exclamation"></i>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <div
+                class="d-flex align-items-center mb-3 bg-danger bg-opacity-10 p-3 rounded-4 border border-danger border-opacity-25 animate-pulse">
+                <i class="fas fa-circle-exclamation text-danger fs-4 me-3"></i>
+                <p class="mb-0 small fw-bold text-danger">MANDATORY NOTICE: This audit provides probabilistic evidence
+                    of media authenticity. Final conclusions must be corroborated with secondary physical and source
+                    investigations.</p>
+            </div>
+            <h5 class="fw-bold border-bottom pb-2 mb-3"><i class="fas fa-file-lines me-2 text-primary"></i> Primary
+                Forensic Reasoning</h5>
+            <div class="alert alert-light border-start border-4 border-primary">
+                <p class="mb-0 fw-bold">{{ data.ai_reason }}</p>
+            </div>
+            <p class="text-dark fs-6 lh-base mb-3">Audit Conclusion: Based on a combined forensic evaluation including
+                error level analysis (ELA), metadata consistency, and texture smoothness, this image is classified as
+                <strong>{{ data.result }}</strong>.
+            </p>
+            <div class="row g-2">
+                {% for reason in data.reasons %}
+                <div class="col-md-6">
+                    <div class="d-flex align-items-baseline mb-2">
+                        <i class="fas fa-caret-right text-primary me-2"></i>
+                        <span class="small text-muted">{{ reason }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Summary Dashboard (Checkbox List Style) -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+            <div class="card-header bg-white border-0 py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-list-check me-2 text-primary"></i> Forensic Breakdown Summary
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush small">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div><i
+                                class="fas {% if data.metadata.has_metadata %}fa-circle-check text-success{% else %}fa-circle-exclamation text-warning{% endif %} me-2"></i>
+                            Metadata Integrity</div>
+                        <span
+                            class="badge {% if data.metadata.has_metadata %}bg-success{% else %}bg-warning{% endif %} rounded-pill">{%
+                            if data.metadata.has_metadata %}Consistent{% else %}Inconclusive{% endif %}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div><i
+                                class="fas {% if not data.is_noise_susc %}fa-circle-check text-success{% else %}fa-circle-xmark text-danger{% endif %} me-2"></i>
+                            Noise Distribution Test</div>
+                        <span
+                            class="badge {% if not data.is_noise_susc %}bg-success{% else %}bg-danger{% endif %} rounded-pill">{%
+                            if not data.is_noise_susc %}Natural{% else %}Artificial{% endif %}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div><i
+                                class="fas {% if not data.is_clone_susc %}fa-circle-check text-success{% else %}fa-circle-xmark text-danger{% endif %} me-2"></i>
+                            Clone Detection Result</div>
+                        <span
+                            class="badge {% if not data.is_clone_susc %}bg-success{% else %}bg-danger{% endif %} rounded-pill">{%
+                            if not data.is_clone_susc %}Unique{% else %}Cloned Area{% endif %}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div><i
+                                class="fas {% if not data.is_blur_susc %}fa-circle-check text-success{% else %}fa-circle-xmark text-danger{% endif %} me-2"></i>
+                            Blur Manipulation Result</div>
+                        <span
+                            class="badge {% if not data.is_blur_susc %}bg-success{% else %}bg-danger{% endif %} rounded-pill">{%
+                            if not data.is_blur_susc %}Natural{% else %}Edited Blur{% endif %}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div><i
+                                class="fas {% if not data.is_hist_susc %}fa-circle-check text-success{% else %}fa-circle-xmark text-danger{% endif %} me-2"></i>
+                            Histogram Integrity</div>
+                        <span
+                            class="badge {% if not data.is_hist_susc %}bg-success{% else %}bg-danger{% endif %} rounded-pill">{%
+                            if not data.is_hist_susc %}Natural{% else %}Manipulated{% endif %}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div><i
+                                class="fas {% if not data.is_ring_susc %}fa-circle-check text-success{% else %}fa-circle-xmark text-danger{% endif %} me-2"></i>
+                            Edge Ringing Test</div>
+                        <span
+                            class="badge {% if not data.is_ring_susc %}bg-success{% else %}bg-danger{% endif %} rounded-pill">{%
+                            if not data.is_ring_susc %}Normal{% else %}Artificial Ringing{% endif %}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                        <div class="fw-bold"><i class="fas fa-wand-magic-sparkles text-primary me-2"></i> Est. AI
+                            Creation Probability</div>
+                        <span class="fw-bold text-primary">{{ data.ai_prob|int }}%</span>
+                    </li>
+                    <li class="list-group-item p-3 border-top border-primary border-4">
+                        <small class="x-small text-uppercase fw-bold text-muted d-block mb-2">Academic Tool
+                            Estimation</small>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-toolbox text-secondary me-3 fs-3"></i>
+                            <div>
+                                <p class="mb-0 fw-bold text-dark small">{{ data.tool_inference }}</p>
+                                <small class="text-muted x-small">Based on pixel distribution and metadata
+                                    heuristics</small>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Region Detail Auditor -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 d-none animate-fade" id="regionDetailPanel">
+            <div class="card-header bg-primary text-white border-0 py-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-magnifying-glass me-2"></i> Block Audit Findings</h6>
+            </div>
+            <div class="card-body p-4 text-center">
+                <div id="reg-badge" class="badge rounded-pill mb-2 px-3 py-2 fs-6"></div>
+                <h5 class="fw-bold mb-1" id="reg-title">Selection Breakdown</h5>
+                <p class="h4 fw-bold text-primary mb-3" id="reg-conf"></p>
+                <hr>
+                <div class="text-start">
+                    <label class="x-small text-uppercase fw-bold text-muted">Heuristic Explanation</label>
+                    <p class="small text-dark mb-2" id="reg-explan"></p>
+                    <label class="x-small text-uppercase fw-bold text-muted">Suspected Tool</label>
+                    <p class="small fw-bold text-primary" id="reg-tool"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXIF Highlights -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-tags me-2 text-primary"></i> EXIF Forensic Markers</h6>
+                <span
+                    class="badge {% if data.metadata.has_metadata %}bg-success{% else %}bg-secondary{% endif %} rounded-pill">{%
+                    if data.metadata.has_metadata %}Found{% else %}Stripped{% endif %}</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0 x-small">
+                        <tbody>
+                            <tr>
+                                <td class="ps-3 py-2 text-muted">File MD5 Hash</td>
+                                <td class="pe-3 py-2 text-end fw-bold text-primary" style="letter-spacing: 1px;">{{
+                                    data.metadata.md5_hash }}</td>
+                            </tr>
+                            <tr>
+                                <td class="ps-3 py-2 text-muted">Resolution</td>
+                                <td class="pe-3 py-2 text-end fw-medium">{{ data.metadata.resolution }}</td>
+                            </tr>
+                            <tr>
+                                <td class="ps-3 py-2 text-muted">Make/Model</td>
+                                <td class="pe-3 py-2 text-end fw-medium">{{ data.metadata.make_model }}</td>
+                            </tr>
+                            <tr>
+                                <td class="ps-3 py-2 text-muted">Authoring App</td>
+                                <td class="pe-3 py-2 text-end fw-medium">{{ data.metadata.software }}</td>
+                            </tr>
+                            <tr>
+                                <td class="ps-3 py-2 text-muted">Capture Date</td>
+                                <td class="pe-3 py-2 text-end fw-medium">{{ data.metadata.timestamp }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light p-3 border-0">
+                <small class="x-small text-muted d-block"><i class="fas fa-circle-info me-1"></i> <strong>Compulsory
+                        Investigator Brief:</strong> Missing metadata (Stripped) is a high-confidence indicator of
+                    web-transit or intentional sanitization common in synthetic media deployment.</small>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- --- VIDEO DETAILED AUDIT REPORT --- -->
+    <div class="col-lg-8">
+        <!-- Frame Anomaly Chart -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <h5 class="fw-bold mb-4"><i class="fas fa-chart-line me-2 text-primary"></i> Frame-by-Frame Anomaly Index
+            </h5>
+            <canvas id="anomalyChart" style="max-height: 300px; width: 100%;"></canvas>
+            <div class="mt-4 p-3 bg-light rounded-4 border-start border-4 border-danger">
+                <h6 class="fw-bold"><i class="fas fa-triangle-exclamation text-danger me-2"></i> High Anomaly
+                    Distribution</h6>
+                <p class="small text-muted mb-0">Spikes above 60 indicate pixel distortion, motion jitter, or
+                    GAN-induced flickering. We found <strong>{{ data.suspicious_frames }}</strong> critical frames in
+                    the audit scope.</p>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
+            <div class="row g-4 mb-0">
+                <div class="col-md-3">
+                    <small class="text-uppercase text-muted fw-bold d-block mb-1">Audit Scope</small>
+                    <span class="h4 fw-bold text-primary">{{ data.analyzed_frames }} Frames</span>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-uppercase text-muted fw-bold d-block mb-1">Anomaly Average</small>
+                    <span class="h4 fw-bold text-warning">{{ data.avg_anomaly_score|int }}%</span>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-uppercase text-muted fw-bold d-block mb-1">AI Prob.</small>
+                    <span class="h4 fw-bold text-danger">{{ data.prob_ai|int }}%</span>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-uppercase text-muted fw-bold d-block mb-1">Total Result</small>
+                    <span class="h6 fw-bold d-block text-uppercase mt-2">{{ data.result }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 shadow">
+            <video controls class="w-100">
+                <source src="{{ url_for('static', filename='uploads/' + data.filename) }}" type="video/mp4">
+            </video>
+            <div class="p-3 text-center bg-white">
+                <small class="text-muted"><i class="fas fa-film me-1"></i> Audited Video Sequence</small>
+            </div>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h6 class="fw-bold mb-3"><i class="fas fa-list me-2"></i> Detailed Observations</h6>
+            <ul class="list-unstyled small">
+                {% for r in data.reasons %}
+                <li class="mb-3 d-flex align-items-start">
+                    <i class="fas fa-check-square text-primary me-3 mt-1"></i>
+                    <span class="text-muted lh-sm">{{ r }}</span>
+                </li>
+                {% endfor %}
+                <li class="p-3 bg-light rounded mt-3">
+                    <small class="x-small text-uppercase fw-bold d-block mb-1 text-muted">Facial Landmark Stability
+                        Audit</small>
+                    <p class="mb-0 fw-bold {% if data.prob_ai > 60 %}text-danger{% else %}text-success{% endif %}">
+                        {% if data.prob_ai > 60 %}Artificial Temporal Smoothing Found{% else %}Natural Landmark
+                        Consistency Found{% endif %}
+                    </p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if data.type == 'video' %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('anomalyChart').getContext('2d');
+    const chartData = {{ data.frame_scores| tojson }};
+    const labels = chartData.map(d => d.frame_index);
+    const scores = chartData.map(d => d.score);
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Anomaly Score Index',
+                data: scores,
+                borderColor: '#0d47a1',
+                backgroundColor: 'rgba(13, 71, 161, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 3,
+                pointBackgroundColor: scores.map(s => s > 60 ? '#e53935' : '#0d47a1')
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, max: 100, title: { display: true, text: 'Confidence Anomaly %' } },
+                x: { title: { display: true, text: 'Frame Index' } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
+{% endif %}
+
+<script>
+    function showMap(mapId) {
+        // Hide all
+        ['map-original', 'map-ela', 'map-noise', 'map-clone', 'map-regions'].forEach(id => {
+            document.getElementById(id).classList.add('d-none');
+        });
+        // Show selected
+        document.getElementById('map-' + mapId).classList.remove('d-none');
+
+        // Manage Buttons State
+        const btns = document.querySelectorAll('#forensicFilters button');
+        btns.forEach(btn => btn.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+    }
+
+    function showRegionDetails(id, explan, conf, tool, isSusc) {
+        const panel = document.getElementById('regionDetailPanel');
+        const badge = document.getElementById('reg-badge');
+        const title = document.getElementById('reg-title');
+        const confText = document.getElementById('reg-conf');
+        const explanText = document.getElementById('reg-explan');
+        const toolText = document.getElementById('reg-tool');
+
+        panel.classList.remove('d-none');
+        panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        if (isSusc === 'True') {
+            badge.className = 'badge rounded-pill mb-2 px-3 py-2 fs-6 bg-danger';
+            badge.innerText = 'Suspicious Detected';
+            title.innerText = 'Manipulated Block';
+        } else {
+            badge.className = 'badge rounded-pill mb-2 px-3 py-2 fs-6 bg-success';
+            badge.innerText = 'Clean Profile';
+            title.innerText = 'Validated Block';
+        }
+
+        confText.innerText = conf;
+        explanText.innerText = explan;
+        toolText.innerText = tool || "None Detected";
+    }
+
+    function sendEmail(id) {
+        fetch(`/send_email/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                alert("Email service error. Check your server configuration.");
+            });
+    }
+</script>
+<style>
+    .region-box {
+        border: 1px dashed rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: 0.1s;
+        position: relative;
+    }
+
+    .region-box:hover {
+        border: 2px solid #0d47a1;
+        background: rgba(13, 71, 161, 0.1);
+    }
+
+    .region-box.suspicious {
+        background: rgba(229, 57, 53, 0.15);
+        border: 2px dashed #e53935 !important;
+    }
+
+    .x-ss-small {
+        font-size: 8px;
+    }
+
+    .x-small {
+        font-size: 11px;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,200 @@
+/* Multi-Layer Forensic Audit Engine - Modern Professional UI */
+
+:root {
+    --primary: #0f172a;
+    --accent: #2563eb;
+    --accent-glow: rgba(37, 99, 235, 0.4);
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --glass: rgba(255, 255, 255, 0.8);
+    --glass-dark: rgba(15, 23, 42, 0.9);
+    --sidebar-w: 260px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism & Cards */
+.card {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1.25rem;
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
+}
+
+.bg-blue-gradient {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: white;
+}
+
+/* Navigation */
+.navbar {
+    background: var(--glass) !important;
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.navbar-brand {
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--primary) !important;
+    font-size: 1.25rem;
+}
+
+.nav-link {
+    color: #64748b !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem !important;
+    transition: var(--transition);
+}
+
+.nav-link:hover {
+    color: var(--accent) !important;
+}
+
+/* Buttons */
+.btn-primary-gradient {
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.btn-primary-gradient:hover {
+    box-shadow: 0 0 20px var(--accent-glow);
+    transform: scale(1.02);
+}
+
+/* Forensic Specific UI */
+.region-box {
+    border: 1px dashed rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    cursor: crosshair;
+    transition: var(--transition);
+}
+
+.region-box.suspicious {
+    background: rgba(239, 68, 68, 0.15);
+    border: 2px dashed var(--danger) !important;
+}
+
+.region-box:hover {
+    background: rgba(37, 99, 235, 0.1);
+    border: 2px solid var(--accent);
+    z-index: 10;
+}
+
+/* Progress & Indicators */
+.progress {
+    background-color: #e2e8f0;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+}
+
+/* Animations */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade {
+    animation: slideUp 0.5s ease-out forwards;
+}
+
+.animate-pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Auth Cards Custom */
+.auth-card {
+    max-width: 480px;
+    margin: 2rem auto;
+}
+
+/* Map Visualization Wrapper */
+#visual-container {
+    border-radius: 1rem;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+#visual-container img {
+    max-width: 100%;
+    height: auto;
+    transition: transform 0.3s;
+}
+
+/* Footer Section */
+footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.grayscale-logo {
+    filter: grayscale(1) brightness(2);
+    opacity: 0.3;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
