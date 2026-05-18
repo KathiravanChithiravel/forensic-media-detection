@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-75 animate-fade">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-body p-5">
+                <div class="text-center mb-5">
+                    <div
+                        class="bg-black d-inline-block p-3 rounded-circle mb-3 shadow-lg border border-warning border-opacity-25">
+                        <i class="fas fa-crown text-warning fs-1"></i>
+                    </div>
+                    <h2 class="fw-black text-white text-uppercase">HEADQUARTERS GATEWAY 🏰</h2>
+                    <p class="text-muted fw-bold">Boss level access only! Show your token.</p>
+                </div>
+
+                <form method="POST">
+                    <div class="form-floating mb-3">
+                        <input type="text" name="username" class="form-control rounded-3 bg-black text-white"
+                            id="adminUser" placeholder="Admin ID" required>
+                        <label for="adminUser" class="text-white-50"><i class="fas fa-user-secret me-2"></i>Admin
+                            Identifier</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="password" name="password" class="form-control rounded-3 bg-black text-white"
+                            id="adminPass" placeholder="Password" required>
+                        <label for="adminPass" class="text-white-50"><i class="fas fa-key me-2"></i>Security Key</label>
+                    </div>
+
+                    <button type="submit"
+                        class="btn btn-primary-gradient w-100 py-3 rounded-pill fw-black shadow-lg hover-scale">
+                        <i class="fas fa-key me-2"></i> OPEN THE PALACE! 🏰
+                    </button>
+                </form>
+
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('login') }}" class="text-decoration-none text-muted small">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Investigator Portal
+                    </a>
+                </div>
+            </div>
+            <div class="bg-danger py-2 px-3 text-center">
+                <small class="text-white opacity-75">Unauthorized access is strictly monitored and logged.</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

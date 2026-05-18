@@ -1,0 +1,196 @@
+/* AI Forensic Audit - Ultra Professional Dark Theme */
+
+:root {
+    --primary: #0f172a;
+    --bg-dark: #020617;
+    --surface: #0f172a;
+    --surface-light: #1e293b;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.35);
+
+    --text-main: #0be01d;
+    --text-muted: #d2e713;
+
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+
+    --border: rgba(247, 232, 232, 0.979);
+
+    --card-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.932);
+
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Body */
+
+body {
+    background: radial-gradient(circle at top, #020614, #020614);
+    color: var(--text-main);
+    font-family: 'Outfit', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #e1e3e9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e1e3e9;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #eaeef1;
+}
+
+/* Navbar */
+
+.navbar {
+    background: rgb(52, 82, 112) !important;
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+}
+
+.navbar-brand {
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text-main) !important;
+}
+
+/* Cards */
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.5rem;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    border-color: var(--accent);
+}
+
+/* Buttons */
+
+.btn-primary-gradient {
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    border: none;
+    color: white;
+    padding: 0.8rem 1.6rem;
+    border-radius: 12px;
+    font-weight: 700;
+    transition: var(--transition);
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);
+}
+
+.btn-primary-gradient:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.6);
+}
+
+/* Forensic Highlight */
+
+.blink-highlight {
+    animation: blink-glow 2.5s infinite ease-in-out;
+    border: 1px solid var(--accent) !important;
+}
+
+@keyframes blink-glow {
+
+    0% {
+        box-shadow: 0 0 5px rgba(59, 130, 246, 0.1);
+    }
+
+    50% {
+        box-shadow: 0 0 25px rgba(247, 249, 252, 0.904);
+        border-color: #dadbdd;
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgb(222, 223, 224);
+    }
+
+}
+
+/* Progress */
+
+.progress {
+    background: var(--surface-light);
+    height: 8px !important;
+    border-radius: 10px;
+}
+
+/* Animations */
+
+.animate-fade {
+    animation: fadeIn 0.0s ease-out;
+}
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+/* Forms */
+
+.form-control {
+    background: #e3e5f1;
+    border: 1px solid var(--border);
+    color: white;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+}
+
+.form-control:focus {
+    background: #020617;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(180, 228, 8, 0.897);
+}
+
+/* Typography Overrides */
+.text-muted,
+.text-white-50 {
+    color: #f1f5f9 !important;
+    /* Light white color for small text */
+}
+
+/* Tables */
+
+.table {
+    color: var(--text-main);
+}
+
+.table thead th {
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+}
+
+.table td {
+    border-bottom: 1px solid var(--border);
+}
+
+/* Footer */
+
+footer {
+    background: #0f173b !important;
+    border-top: 1px solid var(--border);
+}

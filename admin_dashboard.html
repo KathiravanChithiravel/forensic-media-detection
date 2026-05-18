@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade">
+    <!-- Admin Hero Stats -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-lg rounded-5 p-4 bg-primary text-white h-100 hover-scale cursor-pointer"
+                onclick="showTab('users')">
+                <i class="fas fa-user-ninja fs-1 mb-3"></i>
+                <h6 class="text-uppercase small fw-black opacity-75">Truth Hunters</h6>
+                <h2 class="fw-black mb-0">{{ stats.total_users }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-lg rounded-5 p-4 bg-dark text-white h-100 hover-scale cursor-pointer"
+                onclick="filterAudits('all')">
+                <i class="fas fa-scroll fs-1 mb-3 opacity-50"></i>
+                <h6 class="text-uppercase small fw-black opacity-75">Captured Missions</h6>
+                <h2 class="fw-black mb-0">{{ stats.total_audits }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-lg rounded-5 p-4 bg-accent text-white h-100 hover-scale cursor-pointer"
+                onclick="filterAudits('image')">
+                <i class="fas fa-camera-retro fs-1 mb-3 opacity-50"></i>
+                <h6 class="text-uppercase small fw-black opacity-75">Photo Scans</h6>
+                <h2 class="fw-black mb-0">{{ stats.image_audits }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-lg rounded-5 p-4 bg-warning text-dark h-100 hover-scale cursor-pointer"
+                onclick="filterAudits('video')">
+                <i class="fas fa-film fs-1 mb-3 opacity-50"></i>
+                <h6 class="text-uppercase small fw-black opacity-75">CCTV Trails</h6>
+                <h2 class="fw-black mb-0">{{ stats.video_audits }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Tabs -->
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-dark border-secondary border">
+        <div class="card-header bg-black border-0 p-0">
+            <ul class="nav nav-tabs nav-fill admin-tabs" id="adminTab" role="tablist">
+                <li class="nav-item">
+                    <button
+                        class="nav-link active py-4 fw-bold d-flex align-items-center justify-content-center bg-transparent border-0 text-muted"
+                        id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" width="20" height="20"
+                            class="me-2 tab-logo-mini rounded-circle">
+                        <i class="fas fa-user-gear me-2"></i> Investigator Management
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button
+                        class="nav-link py-4 fw-bold d-flex align-items-center justify-content-center bg-transparent border-0 text-muted"
+                        id="uploads-tab" data-bs-toggle="tab" data-bs-target="#uploads" type="button">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" width="20" height="20"
+                            class="me-2 tab-logo-mini rounded-circle">
+                        <i class="fas fa-database me-2"></i> Global Audit Registry
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body p-4">
+            <div class="tab-content" id="adminTabContent">
+                <!-- User Management -->
+                <div class="tab-pane fade show active" id="users" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="border-0">Investigator</th>
+                                    <th class="border-0">Email</th>
+                                    <th class="border-0 text-center">Total Audits</th>
+                                    <th class="border-0">Role</th>
+                                    <th class="border-0 text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in users %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center"
+                                                style="width: 40px; height: 40px;">
+                                                {{ u.username[0]|upper }}
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold d-block text-dark">{{ u.username }}</span>
+                                                <small class="text-muted">ID: #{{ u.id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold text-dark">{{ u.email }}</td>
+                                    <td class="text-center">
+                                        <span
+                                            class="badge bg-dark text-white border border-secondary rounded-pill px-3">
+                                            {{ u.uploads|length }} Files
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if u.is_admin %}
+                                        <span class="badge bg-danger rounded-pill px-3">Administrator</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary rounded-pill px-3">Investigator</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if not u.is_admin %}
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-light btn-sm rounded-circle" type="button"
+                                                data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+                                                <li><a class="dropdown-item text-danger"
+                                                        href="{{ url_for('delete_user', id=u.id) }}"
+                                                        onclick="return confirm('Wipe all data for this user?')">
+                                                        <i class="fas fa-trash-can me-2"></i>Delete Investigator</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Global Upload Audit -->
+                <div class="tab-pane fade" id="uploads" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="input-group search-container-premium bg-black border-secondary border"
+                            style="max-width: 350px;">
+                            <span class="input-group-text bg-black border-0 py-2 ps-3">
+                                <i class="fas fa-magnifying-glass text-primary opacity-75"></i>
+                            </span>
+                            <input type="text" id="auditSearch"
+                                class="form-control border-0 py-2 ps-1 fw-medium bg-black text-white"
+                                placeholder="Audit registry search...">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="auditTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="border-0">Timestamp</th>
+                                    <th class="border-0">Owner</th>
+                                    <th class="border-0">Media Type</th>
+                                    <th class="border-0">Forensic Verdict</th>
+                                    <th class="border-0">Confidence</th>
+                                    <th class="border-0 text-end">Management</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for up in uploads %}
+                                <tr class="audit-row" data-type="{{ up.file_type }}">
+                                    <td class="small text-muted">{{ up.date_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td class="fw-bold">{{ up.owner.username }}</td>
+                                    <td>
+                                        {% if up.file_type == 'image' %}
+                                        <span
+                                            class="badge bg-info-subtle text-info border border-info border-opacity-25 rounded-pill">
+                                            <i class="fas fa-image me-1"></i> Image</span>
+                                        {% else %}
+                                        <span
+                                            class="badge bg-warning-subtle text-warning border border-warning border-opacity-25 rounded-pill">
+                                            <i class="fas fa-video me-1"></i> Video</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="fw-bold {% if 'Fake' in up.result or 'AI' in up.result %}text-danger{% elif 'Real' in up.result %}text-success{% else %}text-warning{% endif %}">
+                                            {{ up.result }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 6px; width: 60px;">
+                                                <div class="progress-bar {% if up.confidence_score > 80 %}bg-danger{% else %}bg-primary{% endif %}"
+                                                    style="width: {{ up.confidence_score }}%"></div>
+                                            </div>
+                                            <span class="small fw-bold">{{ up.confidence_score|int }}%</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-end d-flex justify-content-end align-items-center gap-2">
+                                        <a href="{{ url_for('view_report', report_id=up.id) }}"
+                                            class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                            <i class="fas fa-eye me-1"></i> View Report
+                                        </a>
+                                        <a href="{{ url_for('delete_upload', id=up.id) }}"
+                                            class="btn btn-link text-danger p-0"
+                                            onclick="return confirm('Remove audit record?')">
+                                            <i class="fas fa-times-circle fs-5"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        border-bottom: 3px solid transparent;
+        transition: 0.3s;
+    }
+
+    .admin-tabs .nav-link:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--accent);
+    }
+
+    .admin-tabs .nav-link.active {
+        color: var(--accent) !important;
+        border-bottom: 3px solid var(--accent) !important;
+        background: rgba(59, 130, 246, 0.05) !important;
+    }
+
+    .avatar {
+        font-weight: 800;
+        font-size: 1.2rem;
+    }
+
+    .search-container-premium {
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid var(--border) !important;
+        background: #000;
+    }
+
+    .search-container-premium:focus-within {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        border-color: var(--accent) !important;
+    }
+
+    .tab-logo-mini {
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        filter: grayscale(100%) opacity(0.5);
+    }
+
+    .nav-link.active .tab-logo-mini {
+        filter: grayscale(0%) opacity(1);
+        transform: rotate(360deg) scale(1.3);
+    }
+</style>
+{% block scripts %}
+<script>
+    function showTab(tabId) {
+        const tabTrigger = new bootstrap.Tab(document.getElementById(tabId + '-tab'));
+        tabTrigger.show();
+    }
+
+    function filterAudits(type) {
+        showTab('uploads');
+        const rows = document.querySelectorAll('.audit-row');
+        rows.forEach(row => {
+            if (type === 'all' || row.dataset.type === type) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    document.getElementById('auditSearch').addEventListener('keyup', function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll('#auditTable tbody tr');
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

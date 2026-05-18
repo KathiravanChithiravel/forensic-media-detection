@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fake Media Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome, {{ session['username'] }}</h1>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </header>
+
+    <main>
+        <div class="upload-box">
+            <form action="/predict" method="POST" enctype="multipart/form-data">
+                <input type="file" name="image" accept="image/*" required>
+                <button type="submit">Upload & Detect</button>
+            </form>
+            <p>Supported formats: JPG, PNG</p>
+        </div>
+    </main>
+</body>
+</html>
